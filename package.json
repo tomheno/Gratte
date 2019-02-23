@@ -13,6 +13,7 @@
     "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1",
     "https": "^1.0.0",
+    "json2csv": "^4.3.5",
     "lodash": "^4.17.11",
     "puppeteer": "^1.11.0",
     "request": "^2.88.0",
