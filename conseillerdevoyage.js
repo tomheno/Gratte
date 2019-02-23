@@ -76,7 +76,7 @@ async function paginateNext(page, count) {
   var nextUrl;
 
   if (await page.evaluate(() => {
-      return (!document.querySelector('.next').classList.contains('disabled'));
+      return (document.querySelector('.next') != null);
     })) {
     await page.evaluate(() => {      
       return document.querySelector('.next').href;
