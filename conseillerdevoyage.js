@@ -54,7 +54,7 @@ async function selectPageAndSearch(page) {
   var pagesPassed = 1;
   var categoryPraticiensUrlsCount = 0;
 
-  while (goNext) {
+  while (goNext && pagesPassed < 20) {
     console.log('goNext again');
 
     await getFacilitiesUrls(page).then(newPraticiensUrl => {

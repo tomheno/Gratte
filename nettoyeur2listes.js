@@ -10,7 +10,6 @@ const optsCSV = {
 
 const parse = require('csv-parse/lib/sync')
 const assert = require('assert')
-const fileName = "totreat.csv";
 
 var notClearedDatas;
 var clearedDatas;
@@ -26,14 +25,18 @@ if (argv.domains) {
     console.log('Pas de vérification des domaines');
 }
 
+const fileName = argv.input;
+const excludeFileName = argv.exclude ? argv.exclude : "mailstoremove";
+
+// Exemple :  node nettoyeur2listes.js --input=galeriesUrl.csv --domains=true (--exclude=mailstoremove.csv)
 function run() {
-    fs.readFile("urls/mailstoremove.csv", "utf8", function (err, data) {
+    fs.readFile("urls/" + excludeFileName + ".csv", "utf8", function (err, data) {
         mailsToRemove = _.flatten(parse(data, {
             columns: false,
             skip_empty_lines: true
         }));
 
-        fs.readFile("urls/" + fileName, "utf8", function (err, data) {
+        fs.readFile("urls/" + fileName + ".csv", "utf8", function (err, data) {
             notClearedDatas = parse(data, {
                 columns: false,
                 skip_empty_lines: true
@@ -103,7 +106,7 @@ async function saveToFile(array) {
         });
 
         fs.writeFile(
-            './cleaned/cleaned_' + fileName,
+            './cleaned/cleaned_' + fileName + '.csv',
             csv,
             (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('✅  Infos bien nettoyées'))
     } catch (err) {
@@ -118,7 +121,7 @@ async function saveToFileWithRest(array, arrayRest) {
         });
 
         fs.writeFile(
-            './cleaned/cleaned_customMail_' + fileName,
+            './cleaned/cleaned_' + fileName + "_customMail.csv",
             csv,
             (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('✅  Infos avec mails perso bien enregistrées'))
     } catch (err) {
@@ -131,7 +134,7 @@ async function saveToFileWithRest(array, arrayRest) {
         });
 
         fs.writeFile(
-            './cleaned/cleaned_classic_' + fileName,
+            './cleaned/cleaned_' + fileName + "_classic.csv",
             csv,
             (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('✅  Infos avec mails classiques bien enregistrées'))
     } catch (err) {
