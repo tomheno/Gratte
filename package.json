@@ -9,11 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "autodetect-decoder-stream": "^1.0.3",
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
+    "csv-parse": "^4.3.3",
+    "csv-reader": "^1.0.3",
     "fs-extra": "^7.0.1",
     "https": "^1.0.0",
+    "json2csv": "^4.3.5",
     "lodash": "^4.17.11",
+    "minimist": "^1.2.0",
     "puppeteer": "^1.11.0",
     "request": "^2.88.0",
     "unirest": "^0.5.1"

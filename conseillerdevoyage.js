@@ -1,42 +1,47 @@
 const puppeteer = require('puppeteer');
 var _ = require('lodash');
 const fs = require('fs');
-const rootUrl = 'https://www.pointdevente.fr';
 
 async function run() {
   const browser = await puppeteer.launch({
-    headless: false
+    // headless: false
   });
-  
+
 
   praticiensUrls = [];
   const page = await browser.newPage();
   page.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1");
-  
+
 
   page.on('console', msg => {
     for (let i = 0; i < msg.args.length; ++i)
       console.log(`${i}: ${msg.args[i]}`);
   });
-  page.setDefaultNavigationTimeout(1500);
+  page.setDefaultNavigationTimeout(0);
 
   await page.setRequestInterception(true);
-
-  page.on('request', request => {
-    if (request.resourceType() === 'image')
+  page.on('request', (request) => {
+    if (['image', 'stylesheet', 'font', 'script'].indexOf(request.resourceType()) !== -1) {
       request.abort();
-    else
+    } else {
       request.continue();
+    }
   });
 
-  page.on('load', () => console.log("Loaded: " + page.url()));
+  await page.on('load', () => console.log("Loaded: " + page.url()));
 
-  await page.goto('https://www.pointdevente.fr/produit.list?search=1&order_by=validated_at&order_by_date=created_on.DESC&order_dir=desc&offset=0&limit=50&layout=1&location=&search_type=1&recherche%5Bsubtransaction%5D=&recherche%5Bsubtransaction%5D=&recherche%5Btransaction%5D=&recherche%5Bsurface_total_min%5D=&recherche%5Bsurface_total_max%5D=&recherche%5Brent_monthly_display_min%5D=&recherche%5Brent_monthly_display_max%5D=&recherche%5Bprice_selling_min%5D=&recherche%5Bprice_selling_max%5D=&recherche%5Bactivity_possible%5D=', {
-    waitLoad: true, 
-    waitNetworkIdle: true // defaults to false
+  page.setJavaScriptEnabled(false);
+
+  await page.goto('https://www.tripadvisor.fr/Restaurants-g187147-Paris_Ile_de_France.html#EATERY_LIST_CONTENTS', {
+    waitLoad: true,
+    timeout: 3000000
   }); // Root URL
+
+  page.setJavaScriptEnabled(false);
+
   await collectFromPagination(page);
-  await saveToFile(praticiensUrls);
+  await saveToFile(praticiensUrls)
+
   // browser.close();
 }
 
@@ -69,14 +74,30 @@ async function selectPageAndSearch(page) {
 async function paginateNext(page, count) {
   console.log('Page ' + count);
   var nextUrl;
+
   if (await page.evaluate(() => {
-      return ($('.pagination-next').length);
+      return (document.querySelector('.next') != null);
     })) {
-    await page.evaluate(() => {      
-      return $('a.pagination-next').click();
+    await page.evaluate(() => {
+      return document.querySelector('.next').href;
+    }).then(newUrl => {
+      console.log(newUrl);
+      nextUrl = newUrl;
     });
 
-    await page.waitForNavigation({waitUntil : networkidle0 }).then(console.log('new page loaded'));
+    console.log('nextUrl', nextUrl);
+    await page.goto(nextUrl, {
+      waitLoad: true,
+      timeout: 3000000
+    }).then(async function (response) {
+      console.log('url loaded'); //WORKS FINE
+
+      page.on('dialog', async dialog => {
+        console.log(dialog.message());
+        await dialog.dismiss();
+      });
+    })
+
     return true;
   } else {
     return false;
@@ -86,13 +107,14 @@ async function paginateNext(page, count) {
 
 async function collectFromPagination(page) {
   console.log('collecting from pagination');
-    await selectPageAndSearch(page);
+  await selectPageAndSearch(page);
 }
 
 async function getFacilitiesUrls(page) {
   console.log('getting facilities url');
+
   return await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('.block-card-detail a.btn.btn-primary')).map(link => link.href);
+    return Array.from(document.querySelectorAll('.locationList .listing a.details.detailsLLR.details_bauhaus_simple')).map(link => link.href);
   });
 };
 
@@ -100,5 +122,10 @@ async function saveToFile(array) {
   fs.writeFile(
     './urls/urls' + +new Date() + '.json',
     JSON.stringify(array, null, 2),
-    (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('Les addresses sont dans la boîte ;)'))
+    (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('Nouvelles URLS stockées'))
+
+  fs.writeFile(
+    './urls/restosUrls.json',
+    JSON.stringify(array, null, 2),
+    (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('Nouvelle liste prête ;)'))
 }
