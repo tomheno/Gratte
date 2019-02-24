@@ -73,13 +73,13 @@ const getDatasFromPage = async (data, url) => {
 
 
 const runThroughUrlFiles = async () => {
-    var chunkedUrls = _.chunk(restosUrls, 50);
+    var chunkedUrls = _.chunk(restosUrls, 30);
     startTime = moment();
     total = restosUrls.length;
 
     console.log('Le grattage de ' + total + ' urls commence à ' + startTime.format("HH:mm:ss")) 
 
-    await asyncForEach(chunkedUrls, async (urls) =>{
+    await forEach(chunkedUrls, async (urls) =>{
         await forEach(urls, async (url) => {
             getDatasFromPage(await getData(url), url);
         });
