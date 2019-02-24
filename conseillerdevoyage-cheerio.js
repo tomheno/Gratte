@@ -20,7 +20,9 @@ var restosUrlsFile = fs.readFileSync("urls/restosUrls.json");
 var restosUrls = JSON.parse(restosUrlsFile);
 
 const fieldsCSV = ['nom', 'mail', 'tel', 'addresse', 'url'];
-const optsCSV = { fieldsCSV };
+const optsCSV = {
+    fieldsCSV
+};
 
 const listCardLinkSelector = '.annonces_list';
 var propertiesDatas = {};
@@ -41,35 +43,35 @@ const getData = async url => {
 const getDatasFromPage = async (data, url) => {
     const $ = await cheerio.load(data);
 
-        var name = $('.restaurantName h1').text();
-        var mail = $('a[href*="mailto"]') != null && $('a[href*="mailto"]').attr('href') ? $('a[href*="mailto"]').attr('href').replace('mailto:', '').replace('?subject=?', '') : '';
-        var phone = $('.blEntry.phone .detail').text();
-        var address = $('.street-address').text();
-        // var url = rootUrl + $('restaurantName h1').find('a.annonce_action.annonce_action--details')[0].href;
-        var restoDatas = {
-            'name' : name,
-            'mail' : mail,
-            'phone' : phone,
-            'address' : address,
-            'url' : url
-        };
+    var name = $('.restaurantName h1').text();
+    var mail = $('a[href*="mailto"]') != null && $('a[href*="mailto"]').attr('href') ? $('a[href*="mailto"]').attr('href').replace('mailto:', '').replace('?subject=?', '') : '';
+    var phone = $('.blEntry.phone .detail').text();
+    var address = $('.street-address').text();
+    // var url = rootUrl + $('restaurantName h1').find('a.annonce_action.annonce_action--details')[0].href;
+    var restoDatas = {
+        'name': name,
+        'mail': mail,
+        'phone': phone,
+        'address': address,
+        'url': url
+    };
 
-        if (url !== undefined || url !== null) {
-            propertiesDatas = _.concat(propertiesDatas, restoDatas);
-        }
-        
-        console.log(propertiesDatas.length + ' restos grattés');
-        console.log(restoDatas);
+    if (url !== undefined || url !== null) {
+        propertiesDatas = _.concat(propertiesDatas, restoDatas);
+    }
+
+    console.log(propertiesDatas.length + ' restos grattés');
+    console.log(restoDatas);
 }
 
 
 const runThroughUrlFiles = async () => {
     await asyncForEach(restosUrls, async (url) => {
-      await waitFor(50);
-      await getDatasFromPage(await getData(url), url);
+        await waitFor(50);
+        await getDatasFromPage(await getData(url), url);
     });
     console.log('Done');
-  }
+}
 
 async function saveToFile(array) {
     try {
@@ -84,9 +86,9 @@ async function saveToFile(array) {
             './urls/restosInfos.csv',
             csv,
             (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('Infos Restos bien mises à jour'))
-      } catch (err) {
+    } catch (err) {
         console.error(err);
-      }
+    }
 }
 
 async function run() {
@@ -97,9 +99,9 @@ async function run() {
 
 async function asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
+        await callback(array[index], index, array);
     }
-  }
+}
 
-  
+
 run();

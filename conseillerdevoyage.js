@@ -6,12 +6,12 @@ async function run() {
   const browser = await puppeteer.launch({
     // headless: false
   });
-  
+
 
   praticiensUrls = [];
   const page = await browser.newPage();
   page.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1");
-  
+
 
   page.on('console', msg => {
     for (let i = 0; i < msg.args.length; ++i)
@@ -21,23 +21,23 @@ async function run() {
 
   await page.setRequestInterception(true);
   page.on('request', (request) => {
-      if (['image', 'stylesheet', 'font', 'script'].indexOf(request.resourceType()) !== -1) {
-          request.abort();
-      } else {
-          request.continue();
-      }
+    if (['image', 'stylesheet', 'font', 'script'].indexOf(request.resourceType()) !== -1) {
+      request.abort();
+    } else {
+      request.continue();
+    }
   });
 
   await page.on('load', () => console.log("Loaded: " + page.url()));
-  
+
   page.setJavaScriptEnabled(false);
 
   await page.goto('https://www.tripadvisor.fr/Restaurants-g187147-Paris_Ile_de_France.html#EATERY_LIST_CONTENTS', {
-    waitLoad: true, 
+    waitLoad: true,
     timeout: 3000000
   }); // Root URL
 
-  page.setJavaScriptEnabled(false);  
+  page.setJavaScriptEnabled(false);
 
   await collectFromPagination(page);
   await saveToFile(praticiensUrls)
@@ -78,7 +78,7 @@ async function paginateNext(page, count) {
   if (await page.evaluate(() => {
       return (document.querySelector('.next') != null);
     })) {
-    await page.evaluate(() => {      
+    await page.evaluate(() => {
       return document.querySelector('.next').href;
     }).then(newUrl => {
       console.log(newUrl);
@@ -87,9 +87,9 @@ async function paginateNext(page, count) {
 
     console.log('nextUrl', nextUrl);
     await page.goto(nextUrl, {
-      waitLoad: true, 
+      waitLoad: true,
       timeout: 3000000
-    }).then(async function(response) {
+    }).then(async function (response) {
       console.log('url loaded'); //WORKS FINE
 
       page.on('dialog', async dialog => {
@@ -107,7 +107,7 @@ async function paginateNext(page, count) {
 
 async function collectFromPagination(page) {
   console.log('collecting from pagination');
-    await selectPageAndSearch(page);
+  await selectPageAndSearch(page);
 }
 
 async function getFacilitiesUrls(page) {
@@ -123,10 +123,9 @@ async function saveToFile(array) {
     './urls/urls' + +new Date() + '.json',
     JSON.stringify(array, null, 2),
     (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('Nouvelles URLS stockées'))
-    
+
   fs.writeFile(
     './urls/restosUrls.json',
     JSON.stringify(array, null, 2),
     (err) => err ? console.error('Erreur d\'écriture :', err) : console.log('Nouvelle liste prête ;)'))
 }
-
