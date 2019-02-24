@@ -19,6 +19,8 @@
     "json2csv": "^4.3.5",
     "lodash": "^4.17.11",
     "minimist": "^1.2.0",
+    "moment": "^2.24.0",
+    "p-iteration": "^1.1.7",
     "puppeteer": "^1.11.0",
     "request": "^2.88.0",
     "unirest": "^0.5.1"
