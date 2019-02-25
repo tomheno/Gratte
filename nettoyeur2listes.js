@@ -28,7 +28,7 @@ if (argv.domains && argv.domains != false) {
 const fileName = argv.input;
 const excludeFileName = argv.exclude ? argv.exclude : "mailstoremove";
 
-// Exemple :  node nettoyeur2listes.js --input=galeriesUrl.csv --domains=true (--exclude=mailstoremove.csv)
+// Exemple :  node nettoyeur2listes.js --input=galeriesUrl --domains=true (--exclude=mailstoremove)
 function run() {
     fs.readFile("urls/" + excludeFileName + ".csv", "utf8", function (err, data) {
         mailsToRemove = _.flatten(parse(data, {
@@ -67,19 +67,14 @@ function run() {
 
             if (runDomainsCheck) {
                 var datasWithoutDomains = _.remove(datasWithoutDoubles, function (data) {
-                    var valueToReturn = true;
-
-                    _.each(domains, function (domain) {
-                        if (_.includes(_.toLower(data[1]), domain)) {
-                            valueToReturn = false;
+                        if (_.includes(_.toLower(data[4]), "facebook") || data[4].length == 0) {
                             return false;
+                        }else{
+                            return true;
                         }
-                    });
-
-                    return valueToReturn;
                 });
 
-                console.log('Données avec mails, non exclues et avec domaine personnalisé : ' + datasWithoutDomains.length);
+                console.log('Données avec mails, non exclues et avec un site non fb : ' + datasWithoutDomains.length);
             }
 
 
