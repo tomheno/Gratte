@@ -32,7 +32,7 @@ async function run() {
 
   page.setJavaScriptEnabled(false);
 
-  await page.goto('https://www.tripadvisor.fr/Restaurants-g187147-Paris_Ile_de_France.html#EATERY_LIST_CONTENTS', {
+  await page.goto('https://www.tripadvisor.fr/Restaurants-g187147-Paris_Ile_de_France.html', {
     waitLoad: true,
     timeout: 3000000
   }); // Root URL
@@ -114,7 +114,7 @@ async function getFacilitiesUrls(page) {
   console.log('getting facilities url');
 
   return await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('.locationList .listing a.details.detailsLLR.details_bauhaus_simple')).map(link => link.href);
+    return Array.from(document.querySelectorAll('.locationList .listing a.details.detailsLLR.details_bauhaus_simple')).map(link => link.id.substr(1));
   });
 };
 
