@@ -46,14 +46,17 @@ const getData = async url => {
 
 
 const getDatasFromPage = async (data) => {
-        propertiesDatas.push({
-            'name': data.name,
-            'mail': data.email ? data.email : '',
-            'phone': data.phone ? data.phone : '',
-            'address': data.address_obj && data.address_obj.street1 ? data.address_obj.street1 : '',
-            'website' : data.website ? data.website : '',
-            'url': data.web_url
-        });
+    var datas = {
+        'name': data.name,
+        'mail': data.email ? data.email : '',
+        'phone': data.phone ? data.phone : '',
+        'address': data.address_obj && data.address_obj.street1 ? data.address_obj.street1 : '',
+        'website' : data.website ? data.website : '',
+        'url': data.web_url
+    };
+
+    propertiesDatas.push(datas);
+    console.log(datas);
 }
 
 
