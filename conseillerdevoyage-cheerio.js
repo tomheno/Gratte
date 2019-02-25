@@ -30,7 +30,7 @@ const optsCSV = {
 };
 
 const listCardLinkSelector = '.annonces_list';
-var propertiesDatas = {};
+var propertiesDatas = [];
 
 axios.defaults.headers.get = requestConfig;
 
@@ -45,46 +45,36 @@ const getData = async url => {
 };
 
 
-const getDatasFromPage = async (data, url) => {
-    var name = data.name;
-    var mail = data.email ? data.email : '';
-    var phone = data.phone ? data.phone : '';
-    var address = data.address_obj && data.address_obj.street1 ? data.address_obj.street1 : '';
-    var website = data.website ? data.website : '';
-
-    var restoDatas = {
-        'name': name,
-        'mail': mail,
-        'phone': phone,
-        'address': address,
-        'website' : website,
-        'url': url
-    };
-
-    if (url !== undefined || url !== null) {
-        propertiesDatas = _.concat(propertiesDatas, restoDatas);
-    }
-
-   // console.log(restoDatas);
-   var elapsed = moment().diff(startTime, 'seconds');
-   var passed = propertiesDatas.length;
-   var remaining = total - passed;
-
-   console.log(passed + '/' + total +' ('+ Math.round(passed/total * 100) +'%) en ' + fmtMSS(elapsed)+ 'min, ' + remaining + ' restant en ~' + fmtMSS(Math.round((remaining / (passed / elapsed)))) + 'min');
+const getDatasFromPage = async (data) => {
+        propertiesDatas.push({
+            'name': data.name,
+            'mail': data.email ? data.email : '',
+            'phone': data.phone ? data.phone : '',
+            'address': data.address_obj && data.address_obj.street1 ? data.address_obj.street1 : '',
+            'website' : data.website ? data.website : '',
+            'url': data.web_url
+        });
 }
 
 
 const runThroughUrlFiles = async () => {
-    var chunkedUrls = _.chunk(restosUrls, 30);
+    var chunkedUrls = _.chunk(restosUrls, 5000);
     startTime = moment();
     total = restosUrls.length;
 
     console.log('Le grattage de ' + total + ' urls commence à ' + startTime.format("HH:mm:ss")) 
 
-    await forEach(chunkedUrls, async (urls) =>{
+    await asyncForEach(chunkedUrls, async (urls) =>{
         await forEach(urls, async (url) => {
-            getDatasFromPage(await getData(url), url);
+            getDatasFromPage(await getData(url));
         });
+
+        var elapsed = moment().diff(startTime, 'seconds');
+        var passed = propertiesDatas.length;
+        var remaining = total - passed;
+     
+        console.log(passed + '/' + total +' ('+ Math.round(passed/total * 100) +'%) en ' + fmtMSS(elapsed)+ 'min, ' + remaining + ' restant en ~' + fmtMSS(Math.round((remaining / (passed / elapsed)))) + 'min');
+      
     });
 
     console.log('Le grattage se finit en ' + fmtMSS(moment().diff(startTime, 'seconds')) + ' min'); 
@@ -120,18 +110,5 @@ async function asyncForEach(array, callback) {
 }
 
 
- run();
-
-// runTime();
-
-async function runTime(){
-    startTime = moment();
-    console.log('On commence, il est ' + startTime.format("HH:mm:ss")) 
-
-    await waitFor(10000);
-
-    endTime = moment();
-    console.log('Il s\'est passé ' + fmtMSS(endTime.diff(startTime, 'seconds'))+ ' minutes')
-}
-
+run();
 function fmtMSS(s){return(s-(s%=60))/60+(9<s?':':':0')+s}
