@@ -19,6 +19,8 @@ const requestConfig = {
     "sec-origin-policy": "0",
     "upgrade-insecure-requests": "1"
 };
+
+var baseApiURL = 'https://www.tripadvisor.fr/data/1.0/location/';
 var restosUrlsFile = fs.readFileSync("urls/restosUrls.json");
 var restosUrls = JSON.parse(restosUrlsFile);
 
@@ -34,7 +36,7 @@ axios.defaults.headers.get = requestConfig;
 
 const getData = async url => {
     try {
-        const response = await axios.get(url);
+        const response = await axios.get(baseApiURL + url);
         const data = response.data;
         return (data);
     } catch (error) {
@@ -44,18 +46,18 @@ const getData = async url => {
 
 
 const getDatasFromPage = async (data, url) => {
-    const $ = await cheerio.load(data);
+    var name = data.name;
+    var mail = data.email ? data.email : '';
+    var phone = data.phone ? data.phone : '';
+    var address = data.address_obj && data.address_obj.street1 ? data.address_obj.street1 : '';
+    var website = data.website ? data.website : '';
 
-    var name = $('.restaurantName h1').text();
-    var mail = $('a[href*="mailto"]') != null && $('a[href*="mailto"]').attr('href') ? $('a[href*="mailto"]').attr('href').replace('mailto:', '').replace('?subject=?', '') : '';
-    var phone = $('.blEntry.phone .detail').text();
-    var address = $('.street-address').text();
-    // var url = rootUrl + $('restaurantName h1').find('a.annonce_action.annonce_action--details')[0].href;
     var restoDatas = {
         'name': name,
         'mail': mail,
         'phone': phone,
         'address': address,
+        'website' : website,
         'url': url
     };
 
