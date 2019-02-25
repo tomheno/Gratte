@@ -18,7 +18,7 @@ var mailsToRemove;
 var argv = require('minimist')(process.argv.slice(2));
 var runDomainsCheck = false;
 
-if (argv.domains) {
+if (argv.domains && argv.domains != false) {
     runDomainsCheck = true;
     console.log('Vérification des domaines');
 } else {
@@ -56,7 +56,7 @@ function run() {
             console.log('Données avec mails : ' + datasWithMails.length);
 
             var datasWithoutDoubles = _.remove(datasWithMails, function (data) {
-                if (_.includes(mailsToRemove, data[1])) {
+                if (_.includes(_.toLower(mailsToRemove), _.toLower(data[1]))) {
                     return false;
                 } else {
                     return true
@@ -70,7 +70,7 @@ function run() {
                     var valueToReturn = true;
 
                     _.each(domains, function (domain) {
-                        if (_.includes(data[1], domain)) {
+                        if (_.includes(_.toLower(data[1]), domain)) {
                             valueToReturn = false;
                             return false;
                         }
