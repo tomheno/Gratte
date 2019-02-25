@@ -2,6 +2,12 @@ const puppeteer = require('puppeteer');
 var _ = require('lodash');
 const fs = require('fs');
 
+
+var argv = require('minimist')(process.argv.slice(2));
+
+const rootUrl  = argv.rootUrl;
+
+
 async function run() {
   const browser = await puppeteer.launch({
     // headless: false
@@ -32,7 +38,7 @@ async function run() {
 
   page.setJavaScriptEnabled(false);
 
-  await page.goto('https://www.tripadvisor.fr/Restaurants-g187147-Paris_Ile_de_France.html', {
+  await page.goto(rootUrl, {
     waitLoad: true,
     timeout: 3000000
   }); // Root URL
