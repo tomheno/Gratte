@@ -58,7 +58,7 @@ const getDatasFromPage = async (data) => {
 
 
 const runThroughUrlFiles = async () => {
-    var chunkedUrls = _.chunk(restosUrls, 5000);
+    var chunkedUrls = _.chunk(restosUrls, 200);
     startTime = moment();
     total = restosUrls.length;
 
