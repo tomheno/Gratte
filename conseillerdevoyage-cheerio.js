@@ -46,22 +46,19 @@ const getData = async url => {
 
 
 const getDatasFromPage = async (data) => {
-    var datas = {
-        'name': data.name,
-        'mail': data.email ? data.email : '',
-        'phone': data.phone ? data.phone : '',
-        'address': data.address_obj && data.address_obj.street1 ? data.address_obj.street1 : '',
-        'website' : data.website ? data.website : '',
-        'url': data.web_url
-    };
-
-    propertiesDatas.push(datas);
-    console.log(datas);
+        propertiesDatas.push({
+            'name': data.name,
+            'mail': data.email ? data.email : '',
+            'phone': data.phone ? data.phone : '',
+            'address': data.address_obj && data.address_obj.street1 ? data.address_obj.street1 : '',
+            'website' : data.website ? data.website : '',
+            'url': data.web_url
+        });
 }
 
 
 const runThroughUrlFiles = async () => {
-    var chunkedUrls = _.chunk(restosUrls, 10);
+    var chunkedUrls = _.chunk(restosUrls, 200);
     startTime = moment();
     total = restosUrls.length;
 
@@ -87,6 +84,7 @@ const runThroughUrlFiles = async () => {
 }
 
 async function saveToFile(array) {
+    console.log(array);
     try {
         const csv = json2csv(array, optsCSV);
         fs.writeFile(
